@@ -31,7 +31,52 @@ This last line creates a dir `cargo/` and fills it with:
 ```
 $ mkdir ios
 ```
-Note: next we're editing the `src/lib.rs` file in the doc, except it's actually called `main.rs`. That seems like a potential problem.
+
+Note: next we're editing the `src/lib.rs` file in the doc, except it's actually called `main.rs`. That seems like a potential problem. _**Note from me in the future: It is. Rename it to_ `main.rs` _now._
+
+(See the comments in the `lib.rs` file.) Then from the `cargo` directory, we build this mfer:
+
+```
+$ pwd
+$ cargo lipo --release
+```
+
+In Xcode 14.3, making a new project, it's just iOS -> App (not Single View Application). It's probably best if you get your Apple Developer cert setup again. In Xcode -> Settings -> Accounts -> `<your Apple Developer ID>` -> `<select Team>`. From there, create the right type of cert. I couldn't remember which type of cert to choose, but I found this somewhat handy diagram (even though the logic in it is not exactly solid if you think too hard on it). Apologies to whoever made this; I'd give you credit, but I don't remember where I found it..
+
+![Apple Developer Picker Helper](img/Apple_Devel_Certificate_Picker.png)
+
+You'll need that cert made in Apple Developer Portal (https://developer.apple.com/) then head to Certificates -> (+) symbol next to Certificates to make a new one -> Select the matrix item under Software, name your app and create the cert, download it, install into **Keychain Access.app** in macOS. Then make sure it's set in your project in Xcode in your project name under TARGETS -> Signing & Capabilities tab.
+
+![Xcode Settings](img/xcode_settings.png)
+
+And here's what the Xcode project console looks like for signing:
+
+![Xcode Project Signing](img/Xcode_project_signing.png)
+
+One other note from the webpage we're following: if you're on an M1/M2 (Apple Silicon chip) Mac, you need to hard-set under the **Build Settings** tab (when you have your Greetings project under TARGETS selected) -> Architectures section -> Excluded Architectures and set this to `arm64`. It's a bug in the way this puzzle fits together, and this is the only workaround, which is stupid because it has to build arm64 to get on the iPhone anyway. Not my problem, don't care, whatever, go Apple.
+
+Also, when it asks you to add Frameworks, I had to add them by hand twice each time before they would show up. (This is Xcode 14.3)
+Finally when the instructions tell you to add the header file `Greetings-Bridging-Header.h` it tells you to just add it to the project file which defaults to the first `Greetings/` directory. The file needs to be in the subdirectory of that with the same name. So the file should live here, relative to the `greetings/` folder that houses both sides of this project:
+
+```
+ios/Greetings/Greetings-Bridging-Header.h            # *WRONG*
+ios/Greetings/Greetings/Greetings-Bridging-Header.h  # Correct.
+```
+And here's where it all falls apart.
+I've only finished the first part of the final instructions, adding the final `RustGreetings.swift` file and code, but **not** the `ViewController.swift` or `viewDidLoad` parts because I couldn't find them, and I ran it...
+
+AND IT WORKED. Somehow. But how?? Where was the "world!" part? Where did it live? I found that when I created the project in the first part, I set it up with the wrong parameters for the Swift code. I had:
+
+- Interface: **SwiftUI** (it should've been **Storyboard**)
+- Language: **Swift** (this was correct)
+
+Apparently these two files I need to modify only exist in Storyboard. So I had to start it all over. Now that I'm doing it all over again "correctly" it seems, using Storyboard, adding to the right places, now nothing works. Well fuck.
+
+Update: I symlinked the `greetings.h` file from `Greetings/` to `Greetings/Greetings/` so that it's loading properly within that directory, but something else is awry...
+
+
+
+
 
 
 
